@@ -2,11 +2,23 @@
  using namespace std ; 
 
  
+
+ struct AssignmentQueue 
+ {
+    int totalNumberOfRobots ; 
+    Robot* firstBot ; 
+    Robot* current ; // used to track which robot gets the next task 
+ };
  struct Robot 
  {
+   enum Status 
+   {
+      busy , 
+      available 
+   };
     int id ; 
     Robot* next ; 
-    string status ; 
+    Status  status ; 
     Task* taskHistory ;  // This pointer will point towards the first task that this robot has done 
 
  };

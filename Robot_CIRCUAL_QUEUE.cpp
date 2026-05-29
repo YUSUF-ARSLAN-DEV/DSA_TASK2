@@ -82,6 +82,28 @@
          cout << "Currently No Robot are Available to be assigned Tasks Rn " ; 
       }
    }
+      void displayAllRobots() 
+   {
+      Robot* temp = firstBot;
+      int counter = totalNumberOfRobots;
+      do 
+      {
+         cout << "-------------------\n";
+         cout << "Robot ID: " << temp->id << "\n";
+         cout << "Status: " << (temp->status == Robot::Status::busy ? "Busy" : "Available") << "\n";
+         cout << "Current Task: " << (temp->currentTask ? temp->currentTask->id : -1) << "\n"; // if the robot has no current Task Id it is replaced with -1 and then new line 
+         cout << "Task History: ";
+         Task* t = temp->taskHistory;
+         while (t != nullptr) {
+               cout << t->id << " \n";
+               cout << t -> taskDescription << "\n" ;
+               t = t->next; // traverse into the next task to print 
+         }
+         cout << "\n";
+         temp = temp->next;
+         counter--; // we reduce the counter till we have printed the status of everysingle robot 
+      } while (counter != 0);
+   }
 };
  struct Robot 
  {
@@ -126,13 +148,3 @@
     Task* next ; // this is basically a pointer towards the next task 
     // the task history of a robot is stored via a nexted Linked list 
  };
-
-
- void main  () 
-{
-
-
-
-
-
-}

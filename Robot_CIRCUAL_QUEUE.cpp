@@ -1,7 +1,49 @@
- #include <iostream> 
+#include <iostream> 
  using namespace std ; 
 
- 
+ struct Task 
+ {
+    int id ; 
+    string taskDescription ; 
+    Task* next ; // this is basically a pointer towards the next task 
+    // the task history of a robot is stored via a nexted Linked list 
+ };
+
+ struct Robot 
+ {
+   enum Status 
+   {
+      busy , 
+      available , 
+      underMaintainance 
+   };
+    int id ; 
+    Robot* next ; 
+    Status  status ;
+    Task *  currentTask ;  
+    Task* taskHistory ;  // This pointer will point towards the first task that this robot has done 
+    
+   void addTaskToHistory(Task * task ) 
+   {
+      if ( taskHistory == nullptr ) // checking if this is the first task to be assigned 
+      {
+         taskHistory = task ; // this newly assigned tasks becomes the first one
+         return ; // mission finito  
+      }  
+      Task* p  = taskHistory ;
+      while ( p ->next != nullptr ) 
+      {
+         p  = p -> next ; 
+      } 
+      // after the loop we already know that p has a next that is a nullptr 
+      p -> next = task ; 
+   }
+   void completeTask() // this method resets the currentTask Pointer and changes its status to available 
+   {
+      status = available ; 
+      currentTask = nullptr ; 
+   }
+ };
 
  struct AssignmentQueue 
  {
@@ -104,47 +146,9 @@
          counter--; // we reduce the counter till we have printed the status of everysingle robot 
       } while (counter != 0);
    }
-};
- struct Robot 
- {
-   enum Status 
-   {
-      busy , 
-      available , 
-      underMaintainance 
-   };
-    int id ; 
-    Robot* next ; 
-    Status  status ;
-    Task *  currentTask ;  
-    Task* taskHistory ;  // This pointer will point towards the first task that this robot has done 
-    
-   void addTaskToHistory(Task * task ) 
-   {
-      if ( taskHistory == nullptr ) // checking if this is the first task to be assigned 
-      {
-         taskHistory = task ; // this newly assigned tasks becomes the first one
-         return ; // mission finito  
-      }  
-      Task* p  = taskHistory ;
-      while ( p ->next != nullptr ) 
-      {
-         p  = p -> next ; 
-      } 
-      // after the loop we already know that p has a next that is a nullptr 
-      p -> next = task ; 
-   }
-   void completeTask() // this method resets the currentTask Pointer and changes its status to available 
-   {
-      status = available ; 
-      currentTask = nullptr ; 
-   }
- };
 
- struct Task 
- {
-    int id ; 
-    string taskDescription ; 
-    Task* next ; // this is basically a pointer towards the next task 
-    // the task history of a robot is stored via a nexted Linked list 
- };
+};
+   int main() {
+    // test your code here
+    return 0;
+}

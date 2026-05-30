@@ -1,4 +1,4 @@
-#include <iostream> 
+#include <iostream>
  using namespace std ; 
 
  struct Task 
@@ -148,7 +148,3 @@
    }
 
 };
-   int main() {
-    // test your code here
-    return 0;
-}

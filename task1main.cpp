@@ -3,7 +3,7 @@
 #include "OrderManagement.h"
 using namespace std;
 
-int main() {
+int task1Main() {
     OrderManagement orderSystem(3);
 
     int choice = -1;

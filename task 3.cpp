@@ -380,7 +380,7 @@ public:
 // Demo / Test
 // ------------------------------------------------------------
 
-int main() {
+int task3Main() {
     std::cout << "========== ROBOT NAVIGATION AND PATH TRACKING ==========\n";
     std::cout << "TASK 3  |  Data Structure: Self-implemented Stack (LIFO)\n";
     std::cout << "=======================================================\n";

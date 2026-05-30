@@ -5,12 +5,12 @@
 using namespace std;
 
 struct Order {
-    int orderId;
-    string itemName;
+    string orderId;
+    string customerId;
+    string itemId;
     int quantity;
-    string location;
-    string robotId;
-    string status;
+    string orderTime;
+    string orderStatus;
 };
 
 struct Node {

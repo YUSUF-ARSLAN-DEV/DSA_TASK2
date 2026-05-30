@@ -15,11 +15,15 @@ private:
     int pendingCount;
     int completedCount;
     int maxPending;
-    int nextOrderId;
 
     Order currentOrder;
     bool hasCurrentOrder;
 
+    Order dataset[5];
+    int datasetSize;
+    int nextDatasetIndex;
+
+    void initializeDataset();
     Node* createNode(Order order);
     void addCompletedOrder(Order order);
     void clearList(Node*& front, Node*& rear);
@@ -27,19 +31,19 @@ private:
     void displayList(Node* head);
 
 public:
-    OrderManagement(int maxPending = 10);
+    OrderManagement(int maxPending = 3);
     ~OrderManagement();
 
-    int addOrder(string itemName, int quantity, string location);
-    bool assignNextOrderToRobot(string robotId, Order& assignedOrder);
+    bool receiveNextOrder();
+    bool processNextOrder(Order& nextOrder);
     bool completeCurrentOrder();
 
-    bool orderIdExists(int orderId);
+    bool hasMoreDatasetOrders();
     bool hasCurrentProcessingOrder();
-
     bool isPendingEmpty();
     bool isPendingFull();
     int getPendingCount();
+    int getRemainingDatasetOrders();
 
     void displayPendingOrders();
     void displayCurrentOrder();

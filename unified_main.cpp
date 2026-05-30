@@ -65,8 +65,8 @@ void runTask2() {
     } while (choice != 0);
 }
 
-void runFullWorkflow() {
-    cout << "\n========== FULL SYSTEM WORKFLOW ==========\n";
+void runGuidedWorkflow() {
+    cout << "\n============= WAREHOUSE WORKFLOW ==============\n";
 
     OrderManagement om(5);
     AssignmentQueue aq;
@@ -75,92 +75,176 @@ void runFullWorkflow() {
     ItemManager im;
     WarehouseLayout wl;
 
-    aq.addRobot(101);
-    aq.addRobot(102);
-    aq.addRobot(103);
+    for (int i = 1; i <= 5; i++) aq.addRobot(100 + i);
 
-    // Seed items matching order dataset
     im.addItem(205, "Wireless Mouse", "ZA-A1-S1");
     im.addItem(110, "Mechanical Keyboard", "ZA-A2-S1");
     im.addItem(330, "27-inch Monitor", "ZB-B1-S1");
     im.addItem(450, "Desk Lamp", "ZB-B2-S1");
     im.addItem(120, "USB-C Hub", "ZC-C1-S1");
 
-    cout << "\nSeeded items and robots. Starting order processing...\n";
+    int localTaskId = 0;
 
-    for (int orderNum = 0; orderNum < 5; orderNum++) {
-        cout << "\n--------------------------------------------\n";
-        cout << ">>> CYCLE " << (orderNum + 1) << " <<<\n";
-        cout << "--------------------------------------------\n";
+    int nextRobotId = 106;
 
-        // 1. Receive order from dataset
-        if (!om.receiveNextOrder()) {
-            cout << "Error: Could not receive order.\n";
-            break;
-        }
+    for (int cycle = 0; cycle < 5; cycle++) {
+        cout << "\n#############################################\n";
+        cout << "#            ORDER CYCLE " << (cycle + 1) << " OF 5            #\n";
+        cout << "#############################################\n";
 
-        // 2. Process order (dequeue from pending)
         Order current;
-        if (!om.processNextOrder(current)) {
-            cout << "Error: Could not process order.\n";
-            break;
-        }
-
-        cout << "\n[1] ORDER RECEIVED & PROCESSING\n";
-        cout << "  Order ID : " << current.orderId << "\n";
-        cout << "  Customer : " << current.customerId << "\n";
-        cout << "  Item ID  : " << current.itemId << "\n";
-        cout << "  Quantity : " << current.quantity << "\n";
-
-        // 3. Lookup item in ItemManager
-        int itemNum = stoi(current.itemId.substr(1));
-        Item found;
         string location;
 
-        cout << "\n[2] ITEM LOCATION LOOKUP\n";
-        if (im.searchItemById(itemNum, found)) {
-            location = found.location;
-            cout << "  Item : " << found.itemName << "\n";
-            cout << "  Location : " << location << "\n";
-        } else {
-            cout << "  Warning: Item ID " << itemNum << " not found in catalog.\n";
+        // ==== STEP 1: Task 1 — Receive Order ====
+        cout << "\n--- WAREHOUSE ORDER MANAGEMENT ---\n";
+        while (true) {
+            cout << "\n1. Receive Next Order From Dataset\n";
+            cout << "2. Send Next Pending Order For Processing\n";
+            cout << "3. Mark Current Order As Completed\n";
+            cout << "4. Display Pending Orders\n";
+            cout << "5. Display Current Order\n";
+            cout << "6. Display Completed Orders\n";
+            cout << "7. Display Summary\n";
+            cout << "Enter choice: ";
+            int ch; cin >> ch; cin.ignore(1000, '\n');
+            if (ch == 1) {
+                if (om.receiveNextOrder()) {
+                    cout << ">> Next order received and added to pending queue.\n";
+                    break;
+                } else cout << ">> Could not receive order.\n";
+            } else if (ch == 4) om.displayPendingOrders();
+            else if (ch == 5) om.displayCurrentOrder();
+            else if (ch == 6) om.displayCompletedOrders();
+            else if (ch == 7) om.displaySummary();
+            else cout << "Invalid option for this step.\n";
         }
+        cout << "\nPress Enter to continue..."; cin.get();
 
-        // 4. Plan route via WarehouseLayout
-        cout << "\n[3] ROUTE PLANNING\n";
-        if (!location.empty()) {
-            wl.findPath("WH", location);
+        // ==== STEP 2: Task 1 — Process Order ====
+        cout << "\n--- WAREHOUSE ORDER MANAGEMENT ---\n";
+        while (true) {
+            cout << "\n1. Receive Next Order From Dataset\n";
+            cout << "2. Send Next Pending Order For Processing\n";
+            cout << "3. Mark Current Order As Completed\n";
+            cout << "4. Display Pending Orders\n";
+            cout << "5. Display Current Order\n";
+            cout << "6. Display Completed Orders\n";
+            cout << "7. Display Summary\n";
+            cout << "Enter choice: ";
+            int ch; cin >> ch; cin.ignore(1000, '\n');
+            if (ch == 2) {
+                if (om.processNextOrder(current))
+                    cout << ">> Order " << current.orderId << " is now being processed.\n"
+                         << "   Customer: " << current.customerId << "\n"
+                         << "   Item: " << current.itemId << " (Qty: " << current.quantity << ")\n";
+                break;
+            } else if (ch == 1) {
+                if (om.receiveNextOrder()) cout << ">> Next order received.\n";
+                else cout << ">> Could not receive order.\n";
+            } else if (ch == 4) om.displayPendingOrders();
+            else if (ch == 5) om.displayCurrentOrder();
+            else if (ch == 6) om.displayCompletedOrders();
+            else if (ch == 7) om.displaySummary();
+            else cout << "Invalid option for this step.\n";
         }
+        cout << "\nPress Enter to continue..."; cin.get();
 
-        // 5. Assign robot
-        cout << "\n[4] ROBOT ASSIGNMENT\n";
-        Task* task = new Task;
-        task->id = ++taskIdCounter;
-        task->taskDescription = current.itemId + " at " + location;
-        task->next = nullptr;
-        aq.assignTask(task);
+        // ==== STEP 3: Task 4 — Item Lookup ====
+        cout << "\n--- ITEM SEARCH & MANAGEMENT ---\n";
+        { int itemNum = stoi(current.itemId.substr(1));
+          Item found;
+          if (im.searchItemById(itemNum, found)) {
+              location = found.location;
+              cout << "Item ID " << itemNum << ": " << found.itemName << "\n";
+              cout << "Located at: " << location << "\n";
+          } else {
+              cout << "Item " << itemNum << " not found in catalog.\n";
+          } }
+        cout << "\nPress Enter to continue..."; cin.get();
 
-        // 6. Navigate robot to location
-        cout << "\n[5] ROBOT NAVIGATION\n";
+        // ==== STEP 4: Task 5 — Route Planning ====
+        cout << "\n--- WAREHOUSE LAYOUT & NAVIGATION ---\n";
+        if (!location.empty()) wl.findPath("WH", location);
+        cout << "\nPress Enter to continue..."; cin.get();
+
+        // ==== STEP 5: Task 2 — Assign Robot ====
+        cout << "\n--- ROBOT ASSIGNMENT MODULE ---\n";
+        cout << "\nCurrent Robots:\n";
+        aq.displayAllRobots();
+        while (true) {
+            cout << "\n1. Add Robot\n";
+            cout << "2. Assign Task to Next Available Robot\n";
+            cout << "3. Display All Robots\n";
+            cout << "Enter choice: ";
+            int ch; cin >> ch; cin.ignore(1000, '\n');
+            if (ch == 2) {
+                Task* task = new Task;
+                task->id = ++localTaskId;
+                task->taskDescription = current.itemId + " at " + location;
+                task->next = nullptr;
+                aq.assignTask(task);
+                break;
+            } else if (ch == 1) {
+                aq.addRobot(nextRobotId++);
+                cout << "Robot " << (nextRobotId - 1) << " added.\n";
+            } else if (ch == 3) {
+                aq.displayAllRobots();
+            } else {
+                cout << "Invalid choice.\n";
+            }
+        }
+        cout << "\nPress Enter to continue..."; cin.get();
+
+        // ==== STEP 6: Task 3 — Navigation ====
+        cout << "\n--- ROBOT NAVIGATION & PATH TRACKING ---\n";
         if (!location.empty()) {
             int tx = locationToGridX(location);
             int ty = locationToGridY(location);
-
+            cout << "\nTask: Collect " << current.itemId << " from " << location << "\n";
+            cout << "Destination coordinates: (" << tx << ", " << ty << ")\n";
             RobotNavigator robot(0, 0);
             robot.moveToLocation(tx, ty);
             robot.returnToStart();
             robot.displayStatus();
         }
+        cout << "\nPress Enter to continue..."; cin.get();
 
-        // 7. Complete order
-        om.completeCurrentOrder();
-        cout << "\n[6] ORDER COMPLETED\n";
-        cout << "  " << current.orderId << " marked as Completed.\n";
+        // ==== STEP 7: Task 1 — Complete Order ====
+        cout << "\n--- WAREHOUSE ORDER MANAGEMENT ---\n";
+        while (true) {
+            cout << "\n1. Receive Next Order From Dataset\n";
+            cout << "2. Send Next Pending Order For Processing\n";
+            cout << "3. Mark Current Order As Completed\n";
+            cout << "4. Display Pending Orders\n";
+            cout << "5. Display Current Order\n";
+            cout << "6. Display Completed Orders\n";
+            cout << "7. Display Summary\n";
+            cout << "Enter choice: ";
+            int ch; cin >> ch; cin.ignore(1000, '\n');
+            if (ch == 3) {
+                if (om.completeCurrentOrder())
+                    cout << ">> Order " << current.orderId << " marked as Completed!\n";
+                break;
+            } else if (ch == 1) {
+                if (om.receiveNextOrder()) cout << ">> Next order received.\n";
+                else cout << ">> Could not receive order.\n";
+            } else if (ch == 2) {
+                Order temp;
+                if (om.processNextOrder(temp))
+                    cout << ">> Order " << temp.orderId << " is now being processed.\n";
+            } else if (ch == 4) om.displayPendingOrders();
+            else if (ch == 5) om.displayCurrentOrder();
+            else if (ch == 6) om.displayCompletedOrders();
+            else if (ch == 7) om.displaySummary();
+            else cout << "Invalid option for this step.\n";
+        }
     }
 
-    cout << "\n========== WORKFLOW SUMMARY ==========\n";
+    cout << "\n========== ALL ORDERS COMPLETE ==========\n";
     om.displaySummary();
-    cout << "======================================\n";
+    cout << "========================================\n";
+    cout << "\nPress Enter to return to main menu...";
+    cin.get();
 }
 
 int main() {
@@ -169,23 +253,13 @@ int main() {
         cout << "\n============================================\n";
         cout << "   WAREHOUSE ROBOT NAVIGATION SYSTEM\n";
         cout << "============================================\n";
-        cout << "1. Order Management Module\n";
-        cout << "2. Robot Assignment Module\n";
-        cout << "3. Robot Navigation & Path Tracking\n";
-        cout << "4. Item Search & Management\n";
-        cout << "5. Warehouse Layout & Navigation\n";
-        cout << "6. Full System Workflow\n";
+        cout << "1. Start\n";
         cout << "0. Exit\n";
         cout << "Enter choice: ";
         cin >> choice;
         cin.ignore(1000, '\n');
 
-        if (choice == 1) task1Main();
-        else if (choice == 2) runTask2();
-        else if (choice == 3) task3Main();
-        else if (choice == 4) task4Main();
-        else if (choice == 5) task5Main();
-        else if (choice == 6) runFullWorkflow();
+        if (choice == 1) runGuidedWorkflow();
         else if (choice == 0) cout << "System exited.\n";
         else cout << "Invalid choice.\n";
     } while (choice != 0);

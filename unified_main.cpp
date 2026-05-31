@@ -55,6 +55,28 @@ bool proceed(const string& msg) {
     return ans == "y" || ans == "Y";
 }
 
+int readInt(const string& prompt) {
+    int value;
+    while (true) {
+        cout << prompt;
+        cin >> value;
+        if (!cin.fail()) {
+            cin.ignore(1000, '\n');
+            return value;
+        }
+        cout << "Invalid input. Please enter a number." << endl;
+        cin.clear();
+        cin.ignore(1000, '\n');
+    }
+}
+
+string readLine(const string& prompt) {
+    string value;
+    cout << prompt;
+    getline(cin, value);
+    return value;
+}
+
 void orderManagement(WorkflowState& state);
 void robotAssignment(WorkflowState& state);
 void itemSearch(WorkflowState& state, bool backendMode);
@@ -81,39 +103,49 @@ void orderManagement(WorkflowState& state) {
         else cin.ignore(1000, '\n');
 
         if (choice == 1) {
-            if (state.om.receiveNextOrder())
-                cout << ">> Next order received and added to pending queue.\n";
-            else
-                cout << ">> Could not receive order.\n";
+            if (!state.om.hasMoreDatasetOrders()) {
+                cout << "No more orders in dataset." << endl;
+            }
+            else if (state.om.isPendingFull()) {
+                cout << "Cannot receive new order: pending queue is full." << endl;
+            }
+            else if (state.om.receiveNextOrder()) {
+                cout << "Next order received and added to pending queue." << endl;
+            }
         }
         else if (choice == 2) {
-            if (state.om.processNextOrder(nextOrder)) {
+            if (state.om.isPendingEmpty()) {
+                cout << "No pending order available." << endl;
+            }
+            else if (state.om.hasCurrentProcessingOrder()) {
+                cout << "One order is already being processed." << endl;
+            }
+            else if (state.om.processNextOrder(nextOrder)) {
                 state.currentOrderId = nextOrder.orderId;
                 state.currentItemId = nextOrder.itemId;
                 state.currentItemNum = stoi(nextOrder.itemId.substr(1));
                 state.currentLocation.clear();
-                cout << ">> Order " << nextOrder.orderId << " is now being processed.\n"
-                     << "   Customer: " << nextOrder.customerId << "\n"
-                     << "   Item: " << nextOrder.itemId << " (Qty: " << nextOrder.quantity << ")\n";
+                cout << "Next pending order sent for processing." << endl;
+                cout << "Order ID: " << nextOrder.orderId << endl;
                 if (proceed("Proceed to Robot Assignment?")) {
                     robotAssignment(state);
                     return;
                 }
-            } else {
-                cout << ">> No pending order to process.\n";
             }
         }
         else if (choice == 3) {
-            if (state.om.completeCurrentOrder())
-                cout << ">> Current order marked as completed.\n";
-            else
-                cout << ">> No current order to complete.\n";
+            if (state.om.completeCurrentOrder()) {
+                cout << "Current order marked as completed." << endl;
+            } else {
+                cout << "No current order to complete." << endl;
+            }
         }
         else if (choice == 4) state.om.displayPendingOrders();
         else if (choice == 5) state.om.displayCurrentOrder();
         else if (choice == 6) state.om.displayCompletedOrders();
         else if (choice == 7) state.om.displaySummary();
-        else if (choice != 0) cout << "Invalid choice.\n";
+        else if (choice == 0) cout << "Program ended." << endl;
+        else cout << "Invalid choice." << endl;
 
     } while (choice != 0);
 }
@@ -206,72 +238,80 @@ void itemSearch(WorkflowState& state, bool backendMode) {
 
     int choice;
     do {
-        cout << "\n--- ITEM SEARCH & MANAGEMENT ---\n";
-        cout << "1. Add Item\n";
-        cout << "2. Search Item by ID\n";
-        cout << "3. Search Item by Name\n";
-        cout << "4. Update Item\n";
-        cout << "5. Delete Item\n";
-        cout << "6. Display All Items\n";
-        cout << "0. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
-        if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); choice = -1; }
-        else cin.ignore(1000, '\n');
+        cout << endl;
+        cout << "ITEM SEARCH AND MANAGEMENT MODULE" << endl;
+        cout << "1. Add Item" << endl;
+        cout << "2. Search Item by ID" << endl;
+        cout << "3. Search Item by Name" << endl;
+        cout << "4. Update Item" << endl;
+        cout << "5. Delete Item" << endl;
+        cout << "6. Display All Items" << endl;
+        cout << "0. Exit" << endl;
+        choice = readInt("Enter your choice: ");
 
         if (choice == 1) {
-            int id;
-            cout << "Enter item ID: "; cin >> id; cin.ignore(1000, '\n');
-            string name, loc;
-            cout << "Enter item name: "; getline(cin, name);
-            cout << "Enter item location: "; getline(cin, loc);
-            if (state.im.addItem(id, name, loc))
-                cout << "Item added.\n";
-            else
-                cout << "Item ID already exists.\n";
+            int id = readInt("Enter item ID: ");
+            string name = readLine("Enter item name: ");
+            string location = readLine("Enter item location: ");
+
+            if (state.im.addItem(id, name, location)) {
+                cout << "Item added successfully." << endl;
+            }
+            else {
+                cout << "Item ID already exists." << endl;
+            }
         }
         else if (choice == 2) {
-            int id;
-            cout << "Enter item ID to search: "; cin >> id; cin.ignore(1000, '\n');
-            Item found;
-            if (state.im.searchItemById(id, found)) {
-                cout << "Item ID: " << found.itemId << "\n";
-                cout << "Item Name: " << found.itemName << "\n";
-                cout << "Location: " << found.location << "\n";
-            } else {
-                cout << "Item not found.\n";
+            int id = readInt("Enter item ID to search: ");
+            Item foundItem;
+
+            if (state.im.searchItemById(id, foundItem)) {
+                cout << "Item found:" << endl;
+                cout << "Item ID: " << foundItem.itemId << endl;
+                cout << "Item Name: " << foundItem.itemName << endl;
+                cout << "Location: " << foundItem.location << endl;
+            }
+            else {
+                cout << "Item not found." << endl;
             }
         }
         else if (choice == 3) {
-            cout << "Enter item name: ";
-            string name; getline(cin, name);
-            if (!state.im.searchItemByName(name))
-                cout << "No items found.\n";
+            string name = readLine("Enter item name to search: ");
+
+            if (!state.im.searchItemByName(name)) {
+                cout << "No items found with that name." << endl;
+            }
         }
         else if (choice == 4) {
-            int id;
-            cout << "Enter item ID to update: "; cin >> id; cin.ignore(1000, '\n');
-            string nn, nl;
-            cout << "Enter new name: "; getline(cin, nn);
-            cout << "Enter new location: "; getline(cin, nl);
-            if (state.im.updateItem(id, nn, nl))
-                cout << "Item updated.\n";
-            else
-                cout << "Item not found.\n";
+            int id = readInt("Enter item ID to update: ");
+            string newName = readLine("Enter new item name: ");
+            string newLocation = readLine("Enter new item location: ");
+
+            if (state.im.updateItem(id, newName, newLocation)) {
+                cout << "Item updated successfully." << endl;
+            }
+            else {
+                cout << "Item not found." << endl;
+            }
         }
         else if (choice == 5) {
-            int id;
-            cout << "Enter item ID to delete: "; cin >> id; cin.ignore(1000, '\n');
-            if (state.im.deleteItem(id))
-                cout << "Item deleted.\n";
-            else
-                cout << "Item not found.\n";
+            int id = readInt("Enter item ID to delete: ");
+
+            if (state.im.deleteItem(id)) {
+                cout << "Item deleted successfully." << endl;
+            }
+            else {
+                cout << "Item not found." << endl;
+            }
         }
         else if (choice == 6) {
             state.im.displayAllItems();
         }
-        else if (choice != 0) {
-            cout << "Invalid choice.\n";
+        else if (choice == 0) {
+            cout << "Exiting program." << endl;
+        }
+        else {
+            cout << "Invalid choice." << endl;
         }
     } while (choice != 0);
 }
@@ -320,7 +360,8 @@ void warehouseLayout(WorkflowState& state, bool backendMode) {
         }
         else if (choice == 5) state.wl.displayAllShelves();
         else if (choice == 6) state.wl.showAvailableLocations();
-        else if (choice != 0) cout << "Invalid choice.\n";
+        else if (choice == 0) cout << "Exiting warehouse navigation module." << endl;
+        else cout << "Invalid choice." << endl;
     } while (choice != 0);
 }
 

@@ -10,11 +10,13 @@
 using namespace std;
 
 struct WorkflowState {
+    // Task 1 owns the order lifecycle: incoming dataset orders, pending queue, current order, and completed history.
     OrderManagement om;
     AssignmentQueue aq;
     ItemManager im;
     WarehouseLayout wl;
 
+    // These shared fields pass the current order details from Task 1 to the later modules in the workflow.
     string currentOrderId;
     string currentItemId;
     int currentItemNum;
@@ -83,6 +85,7 @@ void itemSearch(WorkflowState& state, bool backendMode);
 void warehouseLayout(WorkflowState& state, bool backendMode);
 void robotNavigation(WorkflowState& state, bool backendMode = false);
 
+// Task 1 controls how orders enter the system, wait in FIFO order, and move to completed history.
 void orderManagement(WorkflowState& state) {
     int choice;
     Order nextOrder;
@@ -102,6 +105,7 @@ void orderManagement(WorkflowState& state) {
         if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); choice = -1; }
         else cin.ignore(1000, '\n');
 
+        // Load the next order table row into the pending queue to simulate a new incoming order.
         if (choice == 1) {
             if (!state.om.hasMoreDatasetOrders()) {
                 cout << "No more orders in dataset." << endl;
@@ -113,6 +117,7 @@ void orderManagement(WorkflowState& state) {
                 cout << "Next order received and added to pending queue." << endl;
             }
         }
+        // Hand off the oldest pending order so the next module can continue the workflow.
         else if (choice == 2) {
             if (state.om.isPendingEmpty()) {
                 cout << "No pending order available." << endl;
@@ -121,6 +126,7 @@ void orderManagement(WorkflowState& state) {
                 cout << "One order is already being processed." << endl;
             }
             else if (state.om.processNextOrder(nextOrder)) {
+                // Save the selected order details in shared workflow state so Task 2 and Task 3 work on the same order.
                 state.currentOrderId = nextOrder.orderId;
                 state.currentItemId = nextOrder.itemId;
                 state.currentItemNum = stoi(nextOrder.itemId.substr(1));
@@ -133,6 +139,7 @@ void orderManagement(WorkflowState& state) {
                 }
             }
         }
+        // In the integrated system, this should be used only after the robot has finished the full task successfully.
         else if (choice == 3) {
             if (state.om.completeCurrentOrder()) {
                 cout << "Current order marked as completed." << endl;
@@ -364,8 +371,9 @@ void warehouseLayout(WorkflowState& state, bool backendMode) {
         else cout << "Invalid choice." << endl;
     } while (choice != 0);
 }
-
+// Task 3 handles robot movement, path tracking, and safe return using the recorded movement path.
 void robotNavigation(WorkflowState& state, bool backendMode) {
+    // In manual mode, navigation should only start after the earlier modules have already selected an order and location.
     if (!backendMode && state.currentLocation.empty()) {
         cout << "\nNo destination known.\n";
         cout << "Please process an order through the workflow first.\n";
@@ -373,7 +381,7 @@ void robotNavigation(WorkflowState& state, bool backendMode) {
         cin.get();
         return;
     }
-
+    // Convert the warehouse location code into simple grid coordinates for the navigation demo.
     int tx = locationToGridX(state.currentLocation);
     int ty = locationToGridY(state.currentLocation);
 
@@ -381,13 +389,15 @@ void robotNavigation(WorkflowState& state, bool backendMode) {
     cout << "Task: Collect " << state.currentItemId
          << " from " << state.currentLocation << "\n";
     cout << "Destination coordinates: (" << tx << ", " << ty << ")\n";
-
+    // A fresh navigator is created for each workflow run, starting from the warehouse origin.
     RobotNavigator robot(0, 0);
+    // Move to the destination, then retrace the stored path back to the start.
     robot.moveToLocation(tx, ty);
     robot.returnToStart();
     robot.displayStatus();
     robot.displayNavigationLog();
 
+    // Once navigation is complete, return to Task 1 so the order can be marked as completed.
     if (proceed("Return to Order Management to complete the order?"))
         orderManagement(state);
 }

@@ -12,7 +12,7 @@ enum Direction {
     RIGHT,
     NONE
 };
-
+// Reverse movement uses the opposite direction so the robot can return along the same path.
 Direction inverseDirection(Direction dir) {
     switch (dir) {
         case FORWARD:  return BACKWARD;
@@ -66,7 +66,7 @@ private:
     T* data;
     int capacity;
     int topIndex;
-
+// Grow the stack when it becomes full so movement steps can keep being recorded.
     void resize() {
         int newCapacity = (capacity == 0) ? 4 : capacity * 2;
         T* newData = new T[newCapacity];
@@ -162,6 +162,7 @@ private:
             std::cout << "  (no steps recorded)\n";
             return;
         }
+        // Copy the stack into an array so the path can be displayed in travel order without changing the original log.
         Stack<MovementStep> temp = s;
         int count = temp.size();
         MovementStep* arr = new MovementStep[count];
@@ -180,7 +181,7 @@ private:
 
 public:
     NavigationLog() : totalSteps(0) {}
-
+    // Forward steps are pushed as the robot moves so they can be reversed later.
     void recordForward(const MovementStep& step) {
         forwardPath.push(step);
         totalSteps++;
@@ -234,7 +235,7 @@ public:
         : currentX(sx), currentY(sy),
           startX(sx), startY(sy),
           stepCounter(0), returnedToStart(false) {}
-
+    // Each move updates the robot position and pushes one movement step onto the path stack.
     void move(Direction dir) {
         if (returnedToStart) {
             std::cout << "Error: Robot already returned. Cannot move.\n";
@@ -264,7 +265,7 @@ public:
                   << directionToString(dir)
                   << " -> (" << currentX << "," << currentY << ")\n";
     }
-
+    // This simple route planner moves one grid step at a time until the destination is reached.
     void moveToLocation(int targetX, int targetY) {
         std::cout << "\n>> Navigating to (" << targetX
                   << ", " << targetY << ")...\n";
@@ -282,7 +283,7 @@ public:
         std::cout << ">> Arrived at destination (" << targetX
                   << ", " << targetY << ").\n";
     }
-
+    // Backtracking removes the most recent step first, which matches stack LIFO behavior.
     void backtrack() {
         if (pathStack.isEmpty()) {
             std::cout << "Cannot backtrack: no steps recorded.\n";
@@ -308,7 +309,7 @@ public:
         std::cout << "\n--- Returning to Start ---\n";
 
         int reverseCount = 0;
-
+        // Pop each forward step and apply its inverse direction to return along the exact reverse path.
         while (!pathStack.isEmpty()) {
             MovementStep fs = pathStack.pop();
             reverseCount++;
@@ -379,7 +380,7 @@ public:
 // ------------------------------------------------------------
 // Demo / Test
 // ------------------------------------------------------------
-
+// This demo shows the full Task 3 flow: move forward, handle an obstacle, then return safely to start.
 int task3Main() {
     std::cout << "========== ROBOT NAVIGATION AND PATH TRACKING ==========\n";
     std::cout << "TASK 3  |  Data Structure: Self-implemented Stack (LIFO)\n";

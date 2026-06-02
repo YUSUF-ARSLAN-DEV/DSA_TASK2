@@ -1,0 +1,3 @@
+1- Paste this command in the vs code temrinal : 
+g++ -std=c++17 unified_main.cpp -o unified_main ; if ($?) { .\unified_main }
+2- The program will start running 

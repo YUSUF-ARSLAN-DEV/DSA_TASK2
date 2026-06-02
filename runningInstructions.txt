@@ -1,3 +1,12 @@
 1- Paste this command in the vs code temrinal : 
 g++ -std=c++17 unified_main.cpp -o unified_main ; if ($?) { .\unified_main }
 2- The program will start running 
+
+__________________________________________________
+ Task Distribution : 
+
+ Task 1 : Abdullah Saruf ( task1 file ) - TP084436
+ Task 2 : Yusuf Arslan ( Robot_CIRCULAR_QUEUE)  - TP081181 
+ Task 3 : Ahmed Taha (task3 file )    -  TP082757
+ Task 4 : THIVEDRAAN JAMBU KUMARAN (task4 file ) - TP084888
+ Task 5 : Mazen Lasheen ( task5 file )  - TP084440 

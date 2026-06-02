@@ -1,15 +1,29 @@
-1- Paste this command in the vs code temrinal : 
+1- Paste this command in the vs code terminal: 
 g++ -std=c++17 unified_main.cpp -o unified_main ; if ($?) { .\unified_main }
 2- The program will start running 
 
 __________________________________________________
  Task Distribution : 
 
- Task 1 : Abdullah Saruf ( task1 file ) - TP084436
- Task 2 : Yusuf Arslan ( Robot_CIRCULAR_QUEUE)  - TP081181 
- Task 3 : Ahmed Taha (task3 file )    -  TP082757
- Task 4 : THIVEDRAAN JAMBU KUMARAN (task4 file ) - TP084888
- Task 5 : Mazen Lasheen ( task5 file )  - TP084440 
+ Task 1 : Abdullah Saruf Muhammadh (TP084436)
+ - Order.h
+ - OrderManagement.h
+ - OrderManagement.cpp
+ - task1main.cpp (not used in combined program)
+
+ Task 2 : Yusuf Arslan (TP081181) 
+ - Robot_CIRCULAR_QUEUE
+
+ Task 3 : Ahmed Taha Ahmed Ali Sholkany (TP082757)
+ - task 3.cpp
+
+ Task 4 : Thivedraan Jambu Kumaran (TP084888) 
+ - item_manager.h
+ - item_search_management.cpp
+ - task4.cpp (not used in combined program)
+
+ Task 5 : Mazen Mohamed Elsayed AbdelFattah Mohamed Lasheen (TP084440) 
+ - task5.cpp
 
 
-Note : Dear Lecturer please regroup the files into a folder before you run the command to run the code 
+Note : Dear Lecturer, please regroup the files into a folder before running the command to run the code 

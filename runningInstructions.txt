@@ -10,3 +10,6 @@ __________________________________________________
  Task 3 : Ahmed Taha (task3 file )    -  TP082757
  Task 4 : THIVEDRAAN JAMBU KUMARAN (task4 file ) - TP084888
  Task 5 : Mazen Lasheen ( task5 file )  - TP084440 
+
+
+Note : Dear Lecturer please regroup the files into a folder before you run the command to run the code 

@@ -338,7 +338,7 @@ public:
     }
 };
 
-int main() {
+int task5Main() {
     WarehouseLayout warehouse;
     int choice = -1;
     string fromCode, toCode, searchCode;

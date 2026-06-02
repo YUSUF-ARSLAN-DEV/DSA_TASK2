@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 #include <iostream> 
 #include <string> 
+=======
+#include <iostream>
+>>>>>>> 2f4a6437eac201c1211249805492d0c86330bfb5
  using namespace std ; 
 
  struct Task 
@@ -149,7 +153,3 @@
    }
 
 };
-   int main() {
-    // test your code here
-    return 0;
-}

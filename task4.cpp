@@ -41,7 +41,7 @@ void showMenu(){
     cout << "0. Exit" << endl;
 }
 
-int main(){
+int task4Main(){
     ItemManager itemSystem;
     int choice;
 

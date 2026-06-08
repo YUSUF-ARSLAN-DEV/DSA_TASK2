@@ -22,8 +22,9 @@ struct WorkflowState {
 
     int taskIdCounter;
     int nextRobotId;
+    Robot* currentAssignedRobot;
 
-    WorkflowState() : om(3), taskIdCounter(0), nextRobotId(106) {
+    WorkflowState() : om(3), taskIdCounter(0), nextRobotId(106), currentAssignedRobot(nullptr) {
         aq.firstBot = nullptr;
         aq.currentToBeAssigned = nullptr;
         for (int i = 1; i <= 5; i++) aq.addRobot(100 + i);
@@ -179,7 +180,12 @@ void robotAssignment(WorkflowState& state) {
             task->taskDescription = "Collect " + state.currentItemId;
             task->next = nullptr;
             state.aq.assignTask(task);
-            cout << ">> Task assigned: " << task->taskDescription << "\n";
+            Robot* r = state.aq.firstBot;
+            for (int i = 0; i < state.aq.totalNumberOfRobots; i++) {
+                if (r->currentTask == task) { state.currentAssignedRobot = r; break; }
+                r = r->next;
+            }
+            cout << ">> Task assigned: " << task->taskDescription << " to Robot " << state.currentAssignedRobot->id << "\n";
 
             cout << "\n--- ITEM SEARCH (Auto) ---\n";
             Item found;
@@ -387,6 +393,12 @@ void robotNavigation(WorkflowState& state, bool backendMode) {
     robot.returnToStart();
     robot.displayStatus();
     robot.displayNavigationLog();
+
+    if (state.currentAssignedRobot) {
+        state.currentAssignedRobot->completeTask();
+        cout << ">> Robot " << state.currentAssignedRobot->id << " is now available.\n";
+        state.currentAssignedRobot = nullptr;
+    }
 
     if (proceed("Return to Order Management to complete the order?"))
         orderManagement(state);
